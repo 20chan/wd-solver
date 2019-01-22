@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Threading.Tasks;
 using Vec = System.ValueTuple<int, int>;
 
 namespace wdsolver
@@ -20,6 +20,8 @@ W1 00 00 00 00 00 00 00
 B1 00 00 00 00 00 00 00
 B1 00 00 00 00 00 00 00";
 
+        /*
+
         static string SOLVE = @"
 W0 16 17 18 19 20 21 00
 W0 15 14 13 12 11 22 00
@@ -30,9 +32,9 @@ W0 15 14 13 12 11 22 00
 00 32 00 00 00 00 00 42
 B0 33 00 00 00 00 00 41
 B0 34 35 36 37 38 39 40";
-        */
 
-        /*
+
+        
         static string MAP = @"
 00 00 00 00 00 00 00
 00 00 00 00 00 00 99
@@ -41,6 +43,8 @@ B0 34 35 36 37 38 39 40";
 00 00 00 00 00 00 01
 00 00 00 00 00 00 00";
 
+        /*
+
         static string SOLVE = @"
 21 22 23 24 25 26 27
 20 00 00 07 06 05 28
@@ -48,7 +52,7 @@ B0 34 35 36 37 38 39 40";
 18 B1 B1 09 b2 00 02
 17 16 15 10 11 00 01
 00 00 14 13 12 00 00";
-        */
+*/
         static string MAP = @"
 01 00 00 00 00 00 00 00 99
 00 B1 00 00 W1 00 00 B1 00
@@ -60,6 +64,8 @@ w2 00 00 b2 00 00 w2 00 00
 00 B1 00 00 W1 00 00 B1 00
 00 00 00 00 00 00 00 00 00";
 
+
+
         static string SOLVE = @"";
 
         static Vec UP = (0, -1);
@@ -68,6 +74,7 @@ w2 00 00 b2 00 00 w2 00 00
         static Vec RIGHT = (1, 0);
 
         static Vec[] DIRS = { LEFT, RIGHT, UP, DOWN };
+        static Vec[] DIRS2 = { DOWN, UP, RIGHT, LEFT };
 
         static int width, height;
         static List<Vec> houses;
@@ -125,7 +132,7 @@ w2 00 00 b2 00 00 w2 00 00
                 }
             }
 
-            Solve();
+            Task.WaitAny(Solve(DIRS), Solve(DIRS2));
             // Debug();
         }
 
@@ -350,14 +357,18 @@ w2 00 00 b2 00 00 w2 00 00
             }
         }
 
+        static bool solved = false;
         static int step = 0;
-        static bool Solve(bool right = true)
+        static async Task<bool> Solve(Vec[] dirs, bool right = true)
         {
             step++;
             if (IsOver())
             {
                 if (IsWin())
                 {
+                    if (solved)
+                        return true;
+                    solved = true;
                     Console.WriteLine($"Solved at step {step}!");
                     PrintMap();
                     return true;
@@ -369,7 +380,7 @@ w2 00 00 b2 00 00 w2 00 00
                 if (IsNoHope())
                     return false;
 
-            foreach (var d in DIRS)
+            foreach (var d in dirs)
             {
                 if (CanGo(d))
                 {
@@ -391,7 +402,7 @@ w2 00 00 b2 00 00 w2 00 00
                     */
 
                     // if (Solve(nextright))
-                    if (Solve())
+                    if (await Solve(dirs))
                         return true;
 
                     GoBack(actions);
