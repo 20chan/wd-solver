@@ -1,8 +1,6 @@
 ﻿using System;
-namespace wdsolver
-{
-    public enum Water
-    {
+namespace wdsolver {
+    public enum Water {
         White,
         Blue,
     }

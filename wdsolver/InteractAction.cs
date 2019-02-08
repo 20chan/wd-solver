@@ -1,24 +1,19 @@
 ﻿
 using Vec = System.ValueTuple<int, int>;
 
-namespace wdsolver
-{
-    class InteractAction
-    {
+namespace wdsolver {
+    class InteractAction {
         public Vec xy;
     }
-    class Goto : InteractAction
-    {
+    class Goto : InteractAction {
 
     }
 
-    class Pull : InteractAction
-    {
+    class Pull : InteractAction {
         public Water[] oils;
     }
 
-    class Pour : InteractAction
-    {
+    class Pour : InteractAction {
 
     }
 }

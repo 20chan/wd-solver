@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace wdsolver
-{
-    public class Graph
-    {
+namespace wdsolver {
+    public class Graph {
         List<int>[] adj;
         int width, height;
-        public Graph(int width, int height)
-        {
+        public Graph(int width, int height) {
             var len = width * height + 1;
             adj = new List<int>[len];
             for (int i = 0; i < len; i++)
@@ -18,14 +15,12 @@ namespace wdsolver
             this.height = height;
         }
 
-        public void Add(int s, int d)
-        {
+        public void Add(int s, int d) {
             adj[s].Add(d);
             adj[d].Add(s);
         }
 
-        public bool BFS(int s, int d, bool nearD)
-        {
+        public bool BFS(int s, int d, bool nearD) {
             if (s == d)
                 return true;
 
@@ -39,21 +34,16 @@ namespace wdsolver
 
             var nearDs = new[] { d - 1, d + 1, d - width, d + width };
 
-            while (queue.Count > 0)
-            {
+            while (queue.Count > 0) {
                 s = queue.Dequeue();
-                foreach (var i in adj[s])
-                {
-                    if (nearD)
-                    {
+                foreach (var i in adj[s]) {
+                    if (nearD) {
                         if (nearDs.Contains(i))
                             return true;
-                    }
-                    else if (i == d)
+                    } else if (i == d)
                         return true;
 
-                    if (!visited[i])
-                    {
+                    if (!visited[i]) {
                         visited[i] = true;
                         queue.Enqueue(i);
                     }
@@ -62,8 +52,7 @@ namespace wdsolver
             return false;
         }
 
-        public bool BFSFromNearSources(int s, int d, bool nearD)
-        {
+        public bool BFSFromNearSources(int s, int d, bool nearD) {
             var nearSs = new[] { s - 1, s + 1, s - width, s + width }.Where(i => i >= 0);
 
             var visited = new bool[adj.Length];
@@ -78,21 +67,16 @@ namespace wdsolver
 
             var nearDs = new[] { d - 1, d + 1, d - width, d + width };
 
-            while (queue.Count > 0)
-            {
+            while (queue.Count > 0) {
                 s = queue.Dequeue();
-                foreach (var i in adj[s])
-                {
-                    if (nearD)
-                    {
+                foreach (var i in adj[s]) {
+                    if (nearD) {
                         if (nearDs.Contains(i))
                             return true;
-                    }
-                    else if (i == d)
+                    } else if (i == d)
                         return true;
 
-                    if (!visited[i])
-                    {
+                    if (!visited[i]) {
                         visited[i] = true;
                         queue.Enqueue(i);
                     }

@@ -1,28 +1,23 @@
 ﻿using System;
 using System.Linq;
-namespace wdsolver
-{
-    public class Car
-    {
+namespace wdsolver {
+    public class Car {
         Water[] oils;
         int idx;
 
-        public Car(int length)
-        {
+        public Car(int length) {
             oils = new Water[length];
             idx = 0;
         }
 
-        public Water[] GetOilCopy()
-        {
+        public Water[] GetOilCopy() {
             var w = new Water[oils.Length];
             for (int i = 0; i < w.Length; i++)
                 w[i] = oils[i];
             return w;
         }
 
-        public void SetOil(Water[] oil)
-        {
+        public void SetOil(Water[] oil) {
             for (int i = 0; i < oil.Length; i++)
                 oils[i] = oil[i];
             idx--;
@@ -37,8 +32,7 @@ namespace wdsolver
         public int HowMuchCanPour(Water type)
             => oils.Take(idx).Count(w => w == type);
 
-        public void Pull(Water type)
-        {
+        public void Pull(Water type) {
             if (type == Water.White && idx >= 1)
                 type = oils[0];
             oils[idx] = type;
@@ -48,13 +42,11 @@ namespace wdsolver
             idx++;
         }
 
-        public Water Pour()
-        {
+        public Water Pour() {
             return oils[--idx];
         }
 
-        public void DebugOil()
-        {
+        public void DebugOil() {
             Console.WriteLine($"oils: {string.Join(' ', oils.Take(idx))}");
         }
     }
