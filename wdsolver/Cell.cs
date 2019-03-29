@@ -1,5 +1,5 @@
 ﻿namespace wdsolver {
-    abstract class Cell {
+    public abstract class Cell {
         public static Cell FromString(string val) {
             if (char.IsDigit(val[0]))
                 return new WayPoint { Value = int.Parse(val) };
@@ -23,7 +23,9 @@
     }
 
     class Wall : Cell {
-
+        public override string ToString() {
+            return "XX";
+        }
     }
 
     class WayPoint : Cell {
