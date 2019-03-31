@@ -2,27 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Vec = System.ValueTuple<int, int>;
+using Vec = wdsolver.Vector2;
 
 namespace wdsolver
 {
     public class Solver
     {
-        int width, height;
-
-        Cell[][] parsed_solve;
-
-
-
         private Stage _stage;
         
         public Solver(Stage stage)
         {
             _stage = stage;
         }
-        
-        bool solved = false;
-        int step = 0;
+
+        public void Solve() {
+
+        }
+
+        /*
         async Task<bool> Solve(Vec[] dirs, bool right = true) {
             step++;
             if (IsOver()) {
@@ -57,7 +54,7 @@ namespace wdsolver
                         Console.WriteLine($"step {step} {counter} goes wrong");
                         PrintMap();
                     }
-                    */
+                    
 
                     // if (Solve(nextright))
                     if (await Solve(dirs))
@@ -96,5 +93,6 @@ namespace wdsolver
             }
 
         }
+        */
     }
 }

@@ -59,75 +59,7 @@ B0 34 35 36 37 38 39 40";
 00 w2 W1 w1 00 00
 00 00 00 00 00 99";
 */
-
-
-        static string SOLVE = @"";
-
-        static Vec UP = (0, -1);
-        static Vec DOWN = (0, 1);
-        static Vec LEFT = (-1, 0);
-        static Vec RIGHT = (1, 0);
-
-        static Vec[] DIRS = { LEFT, RIGHT, UP, DOWN };
-        static Vec[] DIRS2 = { DOWN, UP, RIGHT, LEFT };
-
-        static int width, height;
-        static List<Vec> houses;
-        static List<Vec> tanks;
-
-        static Cell[][] parsed_map;
-        static Cell[][] parsed_solve;
-
-        static int counter = 1;
-        static Vec xy;
-        static Vec endpoint;
-
-        static Car car = new Car(2);
-
         static void Main(string[] args) {
-            parsed_map = (from s in MAP.Replace("\r", "").Split('\n')
-                          where s.Length > 0
-                          select s.Split(' ').Select(Cell.FromString).ToArray()
-            ).ToArray();
-
-            /*
-            parsed_solve = (from s in SOLVE.Replace("\r", "").Split('\n')
-                            where s.Length > 0
-                            select s.Split(' ').Select(Cell.FromString).ToArray()
-            ).ToArray();
-            */
-
-            height = parsed_map.Length;
-            width = parsed_map[0].Length;
-
-            houses = new List<Vec>();
-            tanks = new List<Vec>();
-
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    var p = parsed_map[y][x];
-
-                    switch (p) {
-                        case WayPoint w:
-                            if (w.Value == 1)
-                                xy = (x, y);
-                            else if (w.Value == 99)
-                                endpoint = (x, y);
-                            break;
-                        case Tank t:
-                            tanks.Add((x, y));
-                            break;
-                        case House h:
-                            houses.Add((x, y));
-                            break;
-                    }
-                }
-            }
-
-            Task.WaitAny(Solve(DIRS), Solve(DIRS2));
-            // Debug();
         }
-
     }
-
 }

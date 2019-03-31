@@ -1,25 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Vec = System.ValueTuple<int, int>;
+using Vec = wdsolver.Vector2;
 
 namespace wdsolver {
     // 스테이지 시뮬레이터에 좀 더 가까움
     public class Stage {
-        private static Vec UP = (0, -1);
-        private static Vec DOWN = (0, 1);
-        private static Vec LEFT = (-1, 0);
-        private static Vec RIGHT = (1, 0);
-
-        private static Vec[] DIRS = {LEFT, RIGHT, UP, DOWN};
-        private static Vec[] DIRS2 = {DOWN, UP, RIGHT, LEFT};
-
-        
         private readonly int width, height;
         private Cell[][] _map;
         private readonly Vec[] houses;
         private readonly Vec[] tanks;
-        
+
         private Car car;
 
         private Vec xy;
@@ -28,7 +19,7 @@ namespace wdsolver {
 
         private Stage(Cell[][] map) {
             _map = map;
-            
+
             height = map.Length;
             width = map[0].Length;
 
@@ -67,8 +58,8 @@ namespace wdsolver {
 
         public static Stage ParseFromTextMap(string data) {
             var map = from s in data.Replace("\r", "").Split('\n')
-                where s.Length > 0
-                select s.Split(' ').Select(Cell.FromString).ToArray();
+                      where s.Length > 0
+                      select s.Split(' ').Select(Cell.FromString).ToArray();
             return new Stage(map.ToArray());
         }
 
@@ -99,8 +90,8 @@ namespace wdsolver {
             var (x, y) = xy;
             var actions = new List<InteractAction>();
 
-            foreach (var d in DIRS) {
-                var newxy = (x + d.Item1, y + d.Item2);
+            foreach (var d in Vec.DIRS) {
+                Vec newxy = (x + d.X, y + d.Y);
 
                 if (InRange(newxy)) {
                     if (at(newxy) is Tank t) {
@@ -108,7 +99,7 @@ namespace wdsolver {
                             var oils = car.GetOilCopy();
                             while (t.Amount > 0 && car.CanPull()) {
                                 t.Amount -= 1;
-                                actions.Add(new Pull {xy = newxy, oils = oils});
+                                actions.Add(new Pull { xy = newxy, oils = oils });
                                 car.Pull(t.Type);
                             }
                         }
@@ -117,15 +108,15 @@ namespace wdsolver {
                 }
             }
 
-            foreach (var d in DIRS) {
-                var newxy = (x + d.Item1, y + d.Item2);
+            foreach (var d in Vec.DIRS) {
+                Vec newxy = (x + d.X, y + d.Y);
 
                 if (InRange(newxy)) {
                     if (at(newxy) is House h) {
                         if (h.Amount > 0 && car.CanPour(h.Type)) {
                             h.Amount -= 1;
                             car.Pour();
-                            actions.Add(new Pour {xy = newxy});
+                            actions.Add(new Pour { xy = newxy });
                         }
                     }
                 }
@@ -141,7 +132,7 @@ namespace wdsolver {
             xy = (x + dx, y + dy);
             (at(xy) as WayPoint).Value = counter;
             var actions = Interact();
-            actions.Insert(0, new Goto {xy = (x, y)});
+            actions.Insert(0, new Goto { xy = (x, y) });
             return actions;
         }
 
@@ -172,7 +163,7 @@ namespace wdsolver {
                 return true;
 
             bool stuck = true;
-            foreach (var d in DIRS) {
+            foreach (var d in Vec.DIRS) {
                 if (CanGo(d))
                     stuck = false;
             }
@@ -197,11 +188,11 @@ namespace wdsolver {
         }
 
         bool IsNoHope() {
-            if (!IsReachable(xy.Item1, xy.Item2, endpoint.Item1, endpoint.Item2))
+            if (!IsReachable(xy.X, xy.Y, endpoint.X, endpoint.Y))
                 return true;
             foreach (var house in houses.Where(h => (at(h) as House).Amount > 0)) {
                 var h = at(house) as House;
-                if (!IsReachable(xy.Item1, xy.Item2, house.Item1, house.Item2, nearD: true))
+                if (!IsReachable(xy.X, xy.Y, house.X, house.Y, nearD: true))
                     return true;
 
                 // 만약 탱크로부터 물을 가져와야 한다면 적어도 하나 이상의 탱크에서 부족한 물을 가져올 수 있어야 한다
@@ -210,8 +201,8 @@ namespace wdsolver {
                     continue;
                 var notank = true;
                 foreach (var tank in tanks.Where(t => (at(t) as Tank).Amount > 0 && (at(t) as Tank).Type == h.Type)) {
-                    if (IsReachable(house.Item1, house.Item2, tank.Item1, tank.Item2, nearS: true, nearD: true)
-                        && IsReachable(xy.Item1, xy.Item2, tank.Item1, tank.Item2, nearD: true)) {
+                    if (IsReachable(house.X, house.Y, tank.X, tank.Y, nearS: true, nearD: true)
+                        && IsReachable(xy.X, xy.Y, tank.X, tank.Y, nearD: true)) {
                         notank = false;
                         break;
                     }
@@ -230,25 +221,25 @@ namespace wdsolver {
 
             int k = 0;
             for (int y = 0; y < height; y++)
-            for (int x = 0; x < width; x++) {
-                if (InRange((x, y)) && at((x, y)) is WayPoint w && (w.Value == 0 || w.Value == counter)) {
-                    if (reachableBlock(x + 1, y))
-                        g.Add(k, k + 1);
-                    if (reachableBlock(x - 1, y))
-                        g.Add(k, k - 1);
-                    if (reachableBlock(x, y + 1))
-                        g.Add(k, k + width);
-                    if (reachableBlock(x, y - 1))
-                        g.Add(k, k - width);
+                for (int x = 0; x < width; x++) {
+                    if (InRange((x, y)) && at((x, y)) is WayPoint w && (w.Value == 0 || w.Value == counter)) {
+                        if (reachableBlock(x + 1, y))
+                            g.Add(k, k + 1);
+                        if (reachableBlock(x - 1, y))
+                            g.Add(k, k - 1);
+                        if (reachableBlock(x, y + 1))
+                            g.Add(k, k + width);
+                        if (reachableBlock(x, y - 1))
+                            g.Add(k, k - width);
+                    }
+
+                    if (x == sx && y == sy)
+                        s = k;
+                    if (x == dx && y == dy)
+                        d = k;
+
+                    k++;
                 }
-
-                if (x == sx && y == sy)
-                    s = k;
-                if (x == dx && y == dy)
-                    d = k;
-
-                k++;
-            }
 
             if (nearS)
                 return g.BFSFromNearSources(s, d, nearD);
