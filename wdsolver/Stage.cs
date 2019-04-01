@@ -73,7 +73,7 @@ namespace wdsolver {
             return x >= 0 && x < width && y >= 0 && y < height;
         }
 
-        private bool CanGo(Vec direct) {
+        public bool CanGo(Vec direct) {
             var (x, y) = xy;
             var (dx, dy) = direct;
             var coord = (x + dx, y + dy);
@@ -125,7 +125,7 @@ namespace wdsolver {
             return actions;
         }
 
-        List<InteractAction> Goto(Vec direct) {
+        public List<InteractAction> Goto(Vec direct) {
             counter++;
             var (x, y) = xy;
             var (dx, dy) = direct;
