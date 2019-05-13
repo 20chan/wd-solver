@@ -22,34 +22,52 @@
         }
     }
 
-    class Wall : Cell {
+    public class Wall : Cell {
         public override string ToString() {
             return "XX";
         }
+        public override bool Equals(object obj) {
+            return obj is Wall;
+        }
     }
 
-    class WayPoint : Cell {
+    public class WayPoint : Cell {
         public int Value;
 
         public override string ToString() {
             return $"{Value:D2}";
         }
-    }
 
-    abstract class ColoredCell : Cell {
-        public Water Type;
-        public int Amount;
-    }
-
-    class Tank : ColoredCell {
-        public override string ToString() {
-            return $"{char.ToLower(Type.ToString()[0])}{Amount}";
+        public override bool Equals(object obj) {
+            return obj is WayPoint w && w.Value == Value;
         }
     }
 
-    class House : ColoredCell {
+    public abstract class ColoredCell : Cell {
+        public Water Type;
+        public int Amount;
+
+        public override bool Equals(object obj) {
+            return obj is ColoredCell c && c.Type == Type && c.Amount == Amount;
+        }
+    }
+
+    public class Tank : ColoredCell {
+        public override string ToString() {
+            return $"{char.ToLower(Type.ToString()[0])}{Amount}";
+        }
+
+        public override bool Equals(object obj) {
+            return obj is Tank && base.Equals(obj);
+        }
+    }
+
+    public class House : ColoredCell {
         public override string ToString() {
             return $"{char.ToUpper(Type.ToString()[0])}{Amount}";
+        }
+        public override bool Equals(object obj) {
+            return obj is House && base.Equals(obj);
         }
     }
 }

@@ -6,93 +6,63 @@ using Vec = wdsolver.Vector2;
 
 namespace wdsolver
 {
-    public class Solver
-    {
-        private Stage _stage;
-        
-        public Solver(Stage stage)
-        {
-            _stage = stage;
+    public class Solver {
+        private Cell[][] _map;
+        private bool solved = false;
+
+        public Solver(Cell[][] map) {
+            _map = map;
         }
 
-        public void Solve() {
-
+        public Solver(string map) {
+            _map = Stage.ParseMapFromString(map);
         }
 
-        /*
-        async Task<bool> Solve(Vec[] dirs, bool right = true) {
+        public bool TrySolveOneDefaultDirs(out Stage stage, out int step) {
+            var dirs0 = new Vec[] { Vec.LEFT, Vec.RIGHT, Vec.UP, Vec.DOWN };
+            var dirs1 = new Vec[] { Vec.DOWN, Vec.UP, Vec.RIGHT, Vec.LEFT };
+            var tasks = new Task<(bool, int, Stage)>[] { TrySolveOne(dirs0), TrySolveOne(dirs1) };
+
+            var fastest = tasks[Task.WaitAny(tasks)].Result;
+
+            stage = fastest.Item3;
+            step = fastest.Item2;
+            return fastest.Item1;
+        }
+
+        public async Task<(bool, int, Stage)> TrySolveOne(Vec[] dirs) {
+            var stage = new Stage(_map);
+            var (b, i) = await TrySolveOne(dirs, stage, 0);
+            return (b, i, stage);
+        }
+
+        private async Task<(bool, int)> TrySolveOne(Vec[] dirs, Stage stage, int step) {
             step++;
-            if (IsOver()) {
-                if (IsWin()) {
+            if (stage.IsOver()) {
+                if (stage.IsWin()) {
                     if (solved)
-                        return true;
+                        return (true, step);
                     solved = true;
-                    Console.WriteLine($"Solved at step {step}!");
-                    PrintMap();
-                    return true;
-                } else return false;
+                    return (true, step);
+                }
+                else return (false, step);
             }
 
-            if (counter % 2 == 0)
-                if (IsNoHope())
-                    return false;
+            if (step % 2 == 0)
+                if (stage.IsNoHope())
+                    return (false, step);
 
             foreach (var d in dirs) {
-                if (CanGo(d)) {
-                    // var newxy = (xy.Item1 + d.Item1, xy.Item2 + d.Item2);
-                    // var nextright = right && (parsed_solve[newxy.Item2][newxy.Item1] as WayPoint).Value == counter + 1;
+                if (stage.CanGo(d)) {
+                    var actions = stage.Goto(d);
+                    var res = await TrySolveOne(dirs, stage, step);
+                    if (res.Item1)
+                        return (true, res.Item2);
 
-                    var actions = Goto(d);
-                    /*
-                    if (right && nextright)
-                    {
-                        Console.WriteLine($"step {step} {counter} is right");
-                        PrintMap();
-                    }
-                    if (right && !nextright)
-                    {
-                        Console.WriteLine($"step {step} {counter} goes wrong");
-                        PrintMap();
-                    }
-                    
-
-                    // if (Solve(nextright))
-                    if (await Solve(dirs))
-                        return true;
-
-                    GoBack(actions);
+                    stage.GoBack(actions);
                 }
             }
-            return false;
+            return (false, step);
         }
-
-        void Debug() {
-            while (true) {
-                var curd = (-1, -1);
-                foreach (var d in DIRS) {
-                    var newxy = (xy.Item1 + d.Item1, xy.Item2 + d.Item2);
-                    if (InRange(newxy))
-                        if (parsed_solve[newxy.Item2][newxy.Item1] is WayPoint w)
-                            if (w.Value == counter + 1) {
-                                curd = d;
-                                // counter++;
-                                break;
-                            }
-                }
-
-                if (curd == (-1, -1)) {
-                    Console.WriteLine("end");
-                    return;
-                }
-
-                var actions = Goto(curd);
-                PrintMap();
-                Console.WriteLine(string.Join(' ', actions));
-
-                Console.Read();
-            }
-
-        }
-        */
     }
 }

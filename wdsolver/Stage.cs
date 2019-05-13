@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Vec = wdsolver.Vector2;
 
 namespace wdsolver {
-    // 스테이지 시뮬레이터에 좀 더 가까움
     public class Stage {
-        private readonly int width, height;
+        public readonly int Width, Height;
         private Cell[][] _map;
         private readonly Vec[] houses;
         private readonly Vec[] tanks;
@@ -15,19 +15,20 @@ namespace wdsolver {
 
         private Vec xy;
         private Vec endpoint;
+
         private int counter = 1;
 
-        private Stage(Cell[][] map) {
+        public Stage(Cell[][] map) {
             _map = map;
 
-            height = map.Length;
-            width = map[0].Length;
+            Width = map[0].Length;
+            Height = map.Length;
 
             var houses = new List<Vec>();
             var tanks = new List<Vec>();
 
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
+            for (int y = 0; y < Height; y++) {
+                for (int x = 0; x < Width; x++) {
                     var p = map[y][x];
 
                     switch (p) {
@@ -51,16 +52,18 @@ namespace wdsolver {
             this.tanks = tanks.ToArray();
         }
 
-        public void PrintMap() {
-            for (int y = 0; y < height; y++)
-                Console.WriteLine(string.Join<Cell>(' ', _map[y]));
+        public Stage(string rawMap) : this(ParseMapFromString(rawMap)) {
         }
 
-        public static Stage ParseFromTextMap(string data) {
-            var map = from s in data.Replace("\r", "").Split('\n')
-                      where s.Length > 0
-                      select s.Split(' ').Select(Cell.FromString).ToArray();
-            return new Stage(map.ToArray());
+        internal static Cell[][] ParseMapFromString(string data) {
+            return (from s in data.Replace("\r", "").Split('\n')
+                    where s.Length > 0
+                    select s.Split(' ').Select(Cell.FromString).ToArray()).ToArray();
+        }
+
+        public void PrintMap() {
+            for (int y = 0; y < Height; y++)
+                Console.WriteLine(string.Join<Cell>(' ', _map[y]));
         }
 
         private Cell at(Vec coord) {
@@ -68,11 +71,14 @@ namespace wdsolver {
             return _map[y][x];
         }
 
-        private bool InRange(Vec coord) {
-            var (x, y) = coord;
-            return x >= 0 && x < width && y >= 0 && y < height;
+        public Cell atDEBUG(Vec coord) {
+            return at(coord);
         }
 
+        private bool InRange(Vec coord) {
+            var (x, y) = coord;
+            return x >= 0 && x < Width && y >= 0 && y < Height;
+        }
         public bool CanGo(Vec direct) {
             var (x, y) = xy;
             var (dx, dy) = direct;
@@ -103,7 +109,6 @@ namespace wdsolver {
                                 car.Pull(t.Type);
                             }
                         }
-
                     }
                 }
             }
@@ -136,7 +141,7 @@ namespace wdsolver {
             return actions;
         }
 
-        void GoBack(List<InteractAction> actions) {
+        public void GoBack(List<InteractAction> actions) {
             foreach (Goto act in actions.Where(a => a is Goto)) {
                 (at(xy) as WayPoint).Value = 0;
                 xy = act.xy;
@@ -152,11 +157,9 @@ namespace wdsolver {
                 (at(act.xy) as ColoredCell).Amount += 1;
                 car.SetOil(act.oils);
             }
-
-            counter -= 1;
         }
 
-        bool IsOver() {
+        public bool IsOver() {
             if ((at(xy) as WayPoint).Value == 99)
                 return true;
             if (xy == endpoint)
@@ -172,7 +175,7 @@ namespace wdsolver {
             return false;
         }
 
-        bool IsWin() {
+        public bool IsWin() {
             if (xy != endpoint)
                 return false;
 
@@ -187,7 +190,7 @@ namespace wdsolver {
             return true;
         }
 
-        bool IsNoHope() {
+        public bool IsNoHope() {
             if (!IsReachable(xy.X, xy.Y, endpoint.X, endpoint.Y))
                 return true;
             foreach (var house in houses.Where(h => (at(h) as House).Amount > 0)) {
@@ -217,20 +220,20 @@ namespace wdsolver {
 
         bool IsReachable(int sx, int sy, int dx, int dy, bool nearS = false, bool nearD = false) {
             int s = -1, d = -1;
-            var g = new Graph(width, height);
+            var g = new Graph(Width, Height);
 
             int k = 0;
-            for (int y = 0; y < height; y++)
-                for (int x = 0; x < width; x++) {
+            for (int y = 0; y < Height; y++)
+                for (int x = 0; x < Width; x++) {
                     if (InRange((x, y)) && at((x, y)) is WayPoint w && (w.Value == 0 || w.Value == counter)) {
                         if (reachableBlock(x + 1, y))
                             g.Add(k, k + 1);
                         if (reachableBlock(x - 1, y))
                             g.Add(k, k - 1);
                         if (reachableBlock(x, y + 1))
-                            g.Add(k, k + width);
+                            g.Add(k, k + Width);
                         if (reachableBlock(x, y - 1))
-                            g.Add(k, k - width);
+                            g.Add(k, k - Width);
                     }
 
                     if (x == sx && y == sy)

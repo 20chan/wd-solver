@@ -1,4 +1,5 @@
 ﻿namespace wdsolver {
+    [System.Diagnostics.DebuggerDisplay("({X}, {Y})")]
     public class Vector2 {
         public int X, Y;
 
@@ -18,6 +19,18 @@
         public void Deconstruct(out int x, out int y) {
             x = X;
             y = Y;
+        }
+
+        public override bool Equals(object obj) {
+            return obj is Vector2 v && v.X == X && v.Y == Y;
+        }
+
+        public static bool operator ==(Vector2 a, Vector2 b) {
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(Vector2 a, Vector2 b) {
+            return !(a == b);
         }
 
         public static readonly Vector2 UP = (0, -1);
