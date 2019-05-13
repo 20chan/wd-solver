@@ -10,7 +10,7 @@ XX XX XX XX
 01 00 00 99
 XX XX XX XX";
 
-            var stage = new Stage(map);
+            var stage = new Stage(map, 1);
 
             Assert.IsFalse(stage.CanGo(Vector2.UP));
             Assert.IsFalse(stage.CanGo(Vector2.DOWN));

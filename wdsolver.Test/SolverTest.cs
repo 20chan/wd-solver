@@ -10,7 +10,7 @@ XX XX XX XX
 01 00 00 99
 XX XX XX XX";
 
-            var solver = new Solver(map);
+            var solver = new Solver(map, 1);
             Assert.IsTrue(solver.TrySolveOneDefaultDirs(out var stage, out int step));
             Assert.AreEqual(new WayPoint { Value = 1 }, stage.atDEBUG(new Vector2(0, 1)));
             Assert.AreEqual(new WayPoint { Value = 2 }, stage.atDEBUG(new Vector2(1, 1)));

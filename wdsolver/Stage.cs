@@ -18,8 +18,9 @@ namespace wdsolver {
 
         private int counter = 1;
 
-        public Stage(Cell[][] map) {
+        public Stage(Cell[][] map, int truckAmount) {
             _map = map;
+            car = new Car(truckAmount);
 
             Width = map[0].Length;
             Height = map.Length;
@@ -52,7 +53,7 @@ namespace wdsolver {
             this.tanks = tanks.ToArray();
         }
 
-        public Stage(string rawMap) : this(ParseMapFromString(rawMap)) {
+        public Stage(string rawMap, int truckAmount) : this(ParseMapFromString(rawMap), truckAmount) {
         }
 
         internal static Cell[][] ParseMapFromString(string data) {
@@ -142,21 +143,23 @@ namespace wdsolver {
         }
 
         public void GoBack(List<InteractAction> actions) {
-            foreach (Goto act in actions.Where(a => a is Goto)) {
+            foreach (var act in actions.OfType<Goto>()) {
                 (at(xy) as WayPoint).Value = 0;
                 xy = act.xy;
                 (at(endpoint) as WayPoint).Value = 99;
             }
 
-            foreach (Pour act in actions.Where(a => a is Pour)) {
+            foreach (var act in actions.OfType<Pour>()) {
                 (at(act.xy) as ColoredCell).Amount += 1;
                 car.Pull((at(act.xy) as ColoredCell).Type);
             }
 
-            foreach (Pull act in actions.Where(a => a is Pull)) {
+            foreach (var act in actions.OfType<Pull>()) {
                 (at(act.xy) as ColoredCell).Amount += 1;
                 car.SetOil(act.oils);
             }
+
+            counter -= 1;
         }
 
         public bool IsOver() {

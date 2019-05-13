@@ -8,14 +8,15 @@ namespace wdsolver
 {
     public class Solver {
         private Cell[][] _map;
+        private int _truckAmount;
         private bool solved = false;
 
-        public Solver(Cell[][] map) {
+        public Solver(Cell[][] map, int truckAmount) {
             _map = map;
+            _truckAmount = truckAmount;
         }
 
-        public Solver(string map) {
-            _map = Stage.ParseMapFromString(map);
+        public Solver(string map, int truckAmount) : this(Stage.ParseMapFromString(map), truckAmount) {
         }
 
         public bool TrySolveOneDefaultDirs(out Stage stage, out int step) {
@@ -31,7 +32,7 @@ namespace wdsolver
         }
 
         public async Task<(bool, int, Stage)> TrySolveOne(Vec[] dirs) {
-            var stage = new Stage(_map);
+            var stage = new Stage(_map, _truckAmount);
             var (b, i) = await TrySolveOne(dirs, stage, 0);
             return (b, i, stage);
         }
