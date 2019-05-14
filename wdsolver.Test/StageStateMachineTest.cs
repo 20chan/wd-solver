@@ -19,7 +19,7 @@ XX XX XX XX";
 
             var actions = stage.Goto(Vector2.RIGHT);
 
-            CollectionAssert.AreEqual(new[] { new Goto { xy = (0, 1) } }, actions);
+            CollectionAssert.AreEqual(new[] { new Goto { xy = new Vector2(0, 1) } }, actions);
         }
 
         [TestMethod]
@@ -34,21 +34,57 @@ XX XX XX XX XX";
             Assert.AreEqual(Water.White, stage.Debug.TruckType());
             Assert.AreEqual(1, stage.Debug.TruckAmount());
             CollectionAssert.AreEqual(new InteractAction[] {
-                new Goto { xy = (0, 1) },
-                new Pull { xy = (1, 0), oil = 0, idx = 0 }, // oil 은 기본값이어가지고 상관없다
+                new Goto { xy = new Vector2(0, 1) },
+                new Pull { xy = new Vector2(1, 0), oil = 0, idx = 0 }, // oil 은 기본값이어가지고 상관없다
             }, goto0);
 
             var goto1 = stage.Goto(Vector2.RIGHT);
             Assert.AreEqual(Water.Green, stage.Debug.TruckType());
             Assert.AreEqual(2, stage.Debug.TruckAmount());
             CollectionAssert.AreEqual(new InteractAction[] {
-                new Goto { xy = (1, 1) },
-                new Pull { xy = (2, 0), oil = Water.White, idx = 1 },
+                new Goto { xy = new Vector2(1, 1) },
+                new Pull { xy = new Vector2(2, 0), oil = Water.White, idx = 1 },
             }, goto1);
 
             var goto2 = stage.Goto(Vector2.RIGHT);
             Assert.AreEqual(Water.Green, stage.Debug.TruckType());
             Assert.AreEqual(2, stage.Debug.TruckAmount());
+        }
+
+        [TestMethod]
+        public void TestB4() {
+            var map = MAPS.B4;
+            var stage = new Stage(map, 2);
+            stage.Goto(Vector2.RIGHT);
+            stage.Goto(Vector2.DOWN);
+            stage.Goto(Vector2.LEFT);
+            stage.Goto(Vector2.DOWN);
+            stage.Goto(Vector2.DOWN);
+            stage.Goto(Vector2.DOWN);
+            stage.Goto(Vector2.DOWN);
+            stage.Goto(Vector2.DOWN);
+            stage.Goto(Vector2.RIGHT);
+            stage.Goto(Vector2.RIGHT);
+            stage.Goto(Vector2.RIGHT);
+            stage.Goto(Vector2.RIGHT);
+            stage.Goto(Vector2.RIGHT);
+            stage.Goto(Vector2.UP);
+            stage.Goto(Vector2.UP);
+            stage.Goto(Vector2.UP);
+            stage.Goto(Vector2.LEFT);
+            stage.Goto(Vector2.LEFT);
+            stage.Goto(Vector2.LEFT);
+            stage.Goto(Vector2.DOWN);
+            stage.Goto(Vector2.LEFT);
+            stage.Goto(Vector2.UP);
+            stage.Goto(Vector2.UP);
+            stage.Goto(Vector2.RIGHT);
+            stage.Goto(Vector2.RIGHT);
+            stage.Goto(Vector2.UP);
+            stage.Goto(Vector2.UP);
+            stage.Goto(Vector2.RIGHT);
+            stage.Goto(Vector2.RIGHT);
+            Assert.IsTrue(stage.IsWin());
         }
     }
 }

@@ -17,5 +17,12 @@ XX XX XX XX";
             Assert.AreEqual(new WayPoint { Value = 3 }, stage.Debug.At(new Vector2(2, 1)));
             Assert.AreEqual(new WayPoint { Value = 4 }, stage.Debug.At(new Vector2(3, 1)));
         }
+
+        [TestMethod]
+        public void TestChapterB() {
+            var map = MAPS.B4;
+            var solver = new Solver(map, 2);
+            Assert.IsTrue(solver.TrySolveOneDefaultDirs(out var stage, out int step));
+        }
     }
 }

@@ -38,15 +38,15 @@ namespace wdsolver {
                     switch (p) {
                         case WayPoint w:
                             if (w.Value == 1)
-                                xy = (x, y);
+                                xy = new Vec(x, y);
                             else if (w.Value == 99)
-                                endpoint = (x, y);
+                                endpoint = new Vec(x, y);
                             break;
                         case Tank t:
-                            tanks.Add((x, y));
+                            tanks.Add(new Vec(x, y));
                             break;
                         case House h:
-                            houses.Add((x, y));
+                            houses.Add(new Vec(x, y));
                             break;
                     }
                 }
@@ -70,19 +70,24 @@ namespace wdsolver {
                 Console.WriteLine(string.Join<Cell>(' ', _map[y]));
         }
 
-        private Cell at(Vec coord) {
-            var (x, y) = coord;
+        private Cell at(in int x, in int y) {
             return _map[y][x];
         }
 
-        private bool InRange(Vec coord) {
-            var (x, y) = coord;
+        private Cell at(in Vec coord) {
+            return at(in coord.X, in coord.Y);
+        }
+
+        private bool InRange(in int x, in int y) {
             return x >= 0 && x < Width && y >= 0 && y < Height;
         }
-        public bool CanGo(Vec direct) {
-            var (x, y) = xy;
-            var (dx, dy) = direct;
-            var coord = (x + dx, y + dy);
+
+        private bool InRange(in Vec coord) {
+            return InRange(in coord.X, in coord.Y);
+        }
+
+        public bool CanGo(in Vec direct) {
+            var coord = xy + direct;
             if (!InRange(coord))
                 return false;
             if (at(coord) is WayPoint w) {
@@ -93,11 +98,10 @@ namespace wdsolver {
         }
 
         private List<InteractAction> Interact() {
-            var (x, y) = xy;
             var actions = new List<InteractAction>();
 
             foreach (var d in Vec.DIRS) {
-                Vec newxy = (x + d.X, y + d.Y);
+                Vec newxy = xy + d;
 
                 if (InRange(newxy)) {
                     if (at(newxy) is Tank t) {
@@ -114,11 +118,11 @@ namespace wdsolver {
             }
 
             foreach (var d in Vec.DIRS) {
-                Vec newxy = (x + d.X, y + d.Y);
+                var newxy = xy + d;
 
                 if (InRange(newxy)) {
                     if (at(newxy) is House h) {
-                        if (h.Amount > 0 && car.CanPour(h.Type)) {
+                        while (h.Amount > 0 && car.CanPour(h.Type)) {
                             h.Amount -= 1;
                             car.Pour();
                             actions.Add(new Pour { xy = newxy });
@@ -132,12 +136,11 @@ namespace wdsolver {
 
         public List<InteractAction> Goto(Vec direct) {
             counter++;
-            var (x, y) = xy;
-            var (dx, dy) = direct;
-            xy = (x + dx, y + dy);
+            var gotoAction = new Goto { xy = xy };
+            xy += direct;
             (at(xy) as WayPoint).Value = counter;
             var actions = Interact();
-            actions.Insert(0, new Goto { xy = (x, y) });
+            actions.Insert(0, gotoAction);
             return actions;
         }
 
@@ -227,7 +230,7 @@ namespace wdsolver {
             int k = 0;
             for (int y = 0; y < Height; y++)
                 for (int x = 0; x < Width; x++) {
-                    if (InRange((x, y)) && at((x, y)) is WayPoint w && (w.Value == 0 || w.Value == counter)) {
+                    if (InRange(x, y) && at(x, y) is WayPoint w && (w.Value == 0 || w.Value == counter)) {
                         if (reachableBlock(x + 1, y))
                             g.Add(k, k + 1);
                         if (reachableBlock(x - 1, y))
@@ -252,7 +255,7 @@ namespace wdsolver {
                 return g.BFS(s, d, nearD);
 
             bool reachableBlock(int x, int y) {
-                return InRange((x, y)) && at((x, y)) is WayPoint w &&
+                return InRange(x, y) && at(x, y) is WayPoint w &&
                        (w.Value == 0 || w.Value == counter || w.Value == 99);
             }
         }

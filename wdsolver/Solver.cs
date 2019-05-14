@@ -33,11 +33,11 @@ namespace wdsolver
 
         public async Task<(bool, int, Stage)> TrySolveOne(Vec[] dirs) {
             var stage = new Stage(_map, _truckAmount);
-            var (b, i) = await TrySolveOne(dirs, stage, 0);
+            var (b, i) = await TrySolveOne(dirs, stage, 0, 0);
             return (b, i, stage);
         }
 
-        private async Task<(bool, int)> TrySolveOne(Vec[] dirs, Stage stage, int step) {
+        private async Task<(bool, int)> TrySolveOne(Vec[] dirs, Stage stage, int step, int depth) {
             step++;
             if (stage.IsOver()) {
                 if (stage.IsWin()) {
@@ -56,7 +56,7 @@ namespace wdsolver
             foreach (var d in dirs) {
                 if (stage.CanGo(d)) {
                     var actions = stage.Goto(d);
-                    var res = await TrySolveOne(dirs, stage, step);
+                    var res = await TrySolveOne(dirs, stage, step, depth + 1);
                     if (res.Item1)
                         return (true, res.Item2);
 

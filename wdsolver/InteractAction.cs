@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Vec = System.ValueTuple<int, int>;
+using Vec = wdsolver.Vector2;
 
 namespace wdsolver {
     public class InteractAction {

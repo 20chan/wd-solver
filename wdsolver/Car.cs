@@ -21,6 +21,10 @@ namespace wdsolver {
                 return false;
             }
 
+            if (idx == 0) {
+                return true;
+            }
+
             if (type == Water.White) {
                 return true;
             }
