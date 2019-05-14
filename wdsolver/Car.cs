@@ -2,29 +2,39 @@
 using System.Linq;
 namespace wdsolver {
     public class Car {
-        Water[] oils;
-        int idx;
+        public Water[] oils;
+        public int idx;
 
         public Car(int length) {
             oils = new Water[length];
             idx = 0;
         }
 
-        public Water[] GetOilCopy() {
-            var w = new Water[oils.Length];
-            for (int i = 0; i < w.Length; i++)
-                w[i] = oils[i];
-            return w;
-        }
-
-        public void SetOil(Water[] oil) {
-            for (int i = 0; i < oil.Length; i++)
-                oils[i] = oil[i];
+        public void SetOil(Water oil) {
+            for (int i = 0; i < oils.Length; i++)
+                oils[i] = oil;
             idx--;
         }
 
-        public bool CanPull()
-            => idx < oils.Length;
+        public bool CanPull(Water type) {
+            if (idx >= oils.Length) {
+                return false;
+            }
+
+            if (type == Water.White) {
+                return true;
+            }
+
+            if (oils.Take(idx).Contains(Water.White)) {
+                return true;
+            }
+
+            if (oils.Take(idx).Contains(type)) {
+                return true;
+            }
+
+            return false;
+        }
 
         public bool CanPour(Water type)
             => idx > 0 && oils.Take(idx).Contains(type);
@@ -36,9 +46,9 @@ namespace wdsolver {
             if (type == Water.White && idx >= 1)
                 type = oils[0];
             oils[idx] = type;
-            if (type == Water.Blue)
+            if (type != Water.White)
                 for (int i = 0; i < idx; i++)
-                    oils[i] = Water.Blue;
+                    oils[i] = type;
             idx++;
         }
 

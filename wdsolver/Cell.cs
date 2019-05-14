@@ -1,24 +1,48 @@
-﻿namespace wdsolver {
+﻿using System;
+
+namespace wdsolver {
     public abstract class Cell {
         public static Cell FromString(string val) {
-            if (char.IsDigit(val[0]))
+            if (char.IsDigit(val[0])) {
                 return new WayPoint { Value = int.Parse(val) };
+            }
 
-            if (val[0] == 'X')
+            if (val[0] == 'X') {
                 return new Wall();
+            }
 
+            if (val[0] == '+') {
+                return new Cross();
+            }
+
+            var type = WaterFromChar(val[0]);
             var amount = int.Parse(val[1].ToString());
 
-            if (val[0] == 'w')
-                return new Tank { Type = Water.White, Amount = amount };
-            if (val[0] == 'b')
-                return new Tank { Type = Water.Blue, Amount = amount };
-            if (val[0] == 'W')
-                return new House { Type = Water.White, Amount = amount };
-            if (val[0] == 'B')
-                return new House { Type = Water.Blue, Amount = amount };
-
-            throw new System.Exception();
+            if (char.IsUpper(val[0])) {
+                return new House { Type = type, Amount = amount };
+            }
+            else {
+                return new Tank { Type = type, Amount = amount };
+            }
+        }
+        
+        private static Water WaterFromChar(char c) {
+            switch (c) {
+                case 'g':
+                case 'G':
+                    return Water.Green;
+                case 'y':
+                case 'Y':
+                    return Water.Yellow;
+                case 'r':
+                case 'R':
+                    return Water.Red;
+                case 'w':
+                case 'W':
+                    return Water.White;
+                default:
+                    throw new IndexOutOfRangeException();
+            }
         }
     }
 
@@ -28,6 +52,15 @@
         }
         public override bool Equals(object obj) {
             return obj is Wall;
+        }
+    }
+
+    public class Cross : Cell {
+        public override string ToString() {
+            return "++";
+        }
+        public override bool Equals(object obj) {
+            return obj is Cross;
         }
     }
 

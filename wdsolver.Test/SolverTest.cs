@@ -12,10 +12,10 @@ XX XX XX XX";
 
             var solver = new Solver(map, 1);
             Assert.IsTrue(solver.TrySolveOneDefaultDirs(out var stage, out int step));
-            Assert.AreEqual(new WayPoint { Value = 1 }, stage.atDEBUG(new Vector2(0, 1)));
-            Assert.AreEqual(new WayPoint { Value = 2 }, stage.atDEBUG(new Vector2(1, 1)));
-            Assert.AreEqual(new WayPoint { Value = 3 }, stage.atDEBUG(new Vector2(2, 1)));
-            Assert.AreEqual(new WayPoint { Value = 4 }, stage.atDEBUG(new Vector2(3, 1)));
+            Assert.AreEqual(new WayPoint { Value = 1 }, stage.Debug.At(new Vector2(0, 1)));
+            Assert.AreEqual(new WayPoint { Value = 2 }, stage.Debug.At(new Vector2(1, 1)));
+            Assert.AreEqual(new WayPoint { Value = 3 }, stage.Debug.At(new Vector2(2, 1)));
+            Assert.AreEqual(new WayPoint { Value = 4 }, stage.Debug.At(new Vector2(3, 1)));
         }
     }
 }

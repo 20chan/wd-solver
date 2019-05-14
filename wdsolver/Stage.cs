@@ -18,9 +18,12 @@ namespace wdsolver {
 
         private int counter = 1;
 
+        public StageDebugger Debug;
+
         public Stage(Cell[][] map, int truckAmount) {
             _map = map;
             car = new Car(truckAmount);
+            Debug = new StageDebugger(this);
 
             Width = map[0].Length;
             Height = map.Length;
@@ -72,10 +75,6 @@ namespace wdsolver {
             return _map[y][x];
         }
 
-        public Cell atDEBUG(Vec coord) {
-            return at(coord);
-        }
-
         private bool InRange(Vec coord) {
             var (x, y) = coord;
             return x >= 0 && x < Width && y >= 0 && y < Height;
@@ -102,11 +101,11 @@ namespace wdsolver {
 
                 if (InRange(newxy)) {
                     if (at(newxy) is Tank t) {
-                        if (t.Amount > 0 && car.CanPull()) {
-                            var oils = car.GetOilCopy();
-                            while (t.Amount > 0 && car.CanPull()) {
+                        if (t.Amount > 0 && car.CanPull(t.Type)) {
+                            while (t.Amount > 0 && car.CanPull(t.Type)) {
                                 t.Amount -= 1;
-                                actions.Add(new Pull { xy = newxy, oils = oils });
+                                var oil = car.oils[0];
+                                actions.Add(new Pull { xy = newxy, oil = oil, idx = car.idx });
                                 car.Pull(t.Type);
                             }
                         }
@@ -156,7 +155,7 @@ namespace wdsolver {
 
             foreach (var act in actions.OfType<Pull>()) {
                 (at(act.xy) as ColoredCell).Amount += 1;
-                car.SetOil(act.oils);
+                car.SetOil(act.oil);
             }
 
             counter -= 1;
@@ -256,6 +255,23 @@ namespace wdsolver {
                 return InRange((x, y)) && at((x, y)) is WayPoint w &&
                        (w.Value == 0 || w.Value == counter || w.Value == 99);
             }
+        }
+
+        public class StageDebugger {
+            private Stage _stage;
+
+            public StageDebugger(Stage stage) {
+                _stage = stage;
+            }
+
+            public Cell At(Vector2 coord)
+                => _stage.at(coord);
+
+            public Water TruckType()
+                => _stage.car.oils[0];
+
+            public int TruckAmount()
+                => _stage.car.idx;
         }
     }
 }
