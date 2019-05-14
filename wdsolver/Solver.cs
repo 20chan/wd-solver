@@ -49,13 +49,15 @@ namespace wdsolver
                 else return (false, step);
             }
 
-            if (step % 2 == 0)
-                if (stage.IsNoHope())
+            if (depth % 4 == 0) {
+                if (stage.IsNoHope()) {
                     return (false, step);
+                }
+            }
 
             foreach (var d in dirs) {
-                if (stage.CanGo(d)) {
-                    var actions = stage.Goto(d);
+                if (stage.CanGo(in d)) {
+                    var actions = stage.Goto(in d);
                     var res = await TrySolveOne(dirs, stage, step, depth + 1);
                     if (res.Item1)
                         return (true, res.Item2);
