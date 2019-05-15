@@ -6,7 +6,7 @@ using Vec = System.ValueTuple<int, int>;
 
 namespace wdsolver {
     class Program {
-        static string MAP = MAPS.B10;
+        static string MAP = MAPS.B_7;
 
         static void Main(string[] args) {
             var stopwatch = new System.Diagnostics.Stopwatch();
